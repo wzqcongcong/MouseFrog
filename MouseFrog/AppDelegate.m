@@ -1,0 +1,162 @@
+//
+//  AppDelegate.m
+//  MouseFrog
+//
+//  Created by GoKu on 25/11/2016.
+//  Copyright © 2016 GoKuStudio. All rights reserved.
+//
+
+#import "AppDelegate.h"
+
+@interface AppDelegate ()
+
+@property (nonatomic, assign) BOOL isMonitoring;
+@property (nonatomic, assign) NSPoint lastLocation;
+
+@end
+
+@implementation AppDelegate
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    // Insert code here to initialize your application
+    
+    [self setLaunchAtLoginForURL:[[NSBundle mainBundle] bundleURL]];
+    self.isMonitoring = NO;
+    self.lastLocation = [NSEvent mouseLocation];
+    
+    [NSEvent addGlobalMonitorForEventsMatchingMask:NSFlagsChangedMask handler:^(NSEvent * _Nonnull event) {
+        self.isMonitoring = (event.modifierFlags & NSFunctionKeyMask) ? YES : NO;
+    }];
+    
+    [NSEvent addGlobalMonitorForEventsMatchingMask:NSMouseMovedMask handler:^(NSEvent * _Nonnull event) {
+        if (([NSScreen screens].count > 1) && self.isMonitoring) {
+            CGPoint toPoint = [self getToPoint];
+            if (!CGPointEqualToPoint(toPoint, CGPointZero)) {
+                [self moveMouseToPoint:toPoint];
+            }
+        }
+        self.lastLocation = [NSEvent mouseLocation];
+    }];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)aNotification {
+    // Insert code here to tear down your application
+}
+
+- (CGPoint)getToPoint
+{
+    CGPoint toPoint = CGPointZero;
+
+    NSArray *screens = [NSScreen screens];
+    if (screens.count <= 1) {
+        return toPoint;
+    }
+    
+    uint32_t maxDisplays = (uint32_t)screens.count;
+    CGDirectDisplayID activeDisplays[maxDisplays];
+    uint32 displayCount;
+    CGGetActiveDisplayList(maxDisplays, activeDisplays, &displayCount);
+    if (displayCount != screens.count) {
+        return toPoint;
+    }
+    
+    NSPoint fromPoint = [NSEvent mouseLocation];
+    CGFloat mouseDeltaX = fromPoint.x - self.lastLocation.x;
+    CGFloat mouseDeltaY = fromPoint.y - self.lastLocation.y;
+
+    NSUInteger fromScreenIndex = [self locatePoint:fromPoint inScreens:screens];
+    if (fromScreenIndex == NSNotFound) {
+        return toPoint;
+    }
+    NSPoint fromScreenCenter = [self centerOfScreen:screens[fromScreenIndex]];
+    
+    for (NSUInteger i = 0; i < screens.count; ++i) {
+        if (i == fromScreenIndex) {
+            continue;
+        }
+        
+        NSPoint screenCenter = [self centerOfScreen:screens[i]];
+        CGFloat screenDeltaX = screenCenter.x - fromScreenCenter.x;
+        CGFloat screenDeltaY = screenCenter.y - fromScreenCenter.y;
+
+        if ((mouseDeltaX * screenDeltaX >= 0) && (mouseDeltaY * screenDeltaY >= 0)) {
+            CGRect cgRect = CGDisplayBounds(activeDisplays[i]);
+            toPoint = CGPointMake(cgRect.origin.x + cgRect.size.width / 2, cgRect.origin.y + cgRect.size.height / 2);
+            break;
+        }
+    }
+    
+    return toPoint;
+}
+
+- (NSUInteger)locatePoint:(NSPoint)point inScreens:(NSArray *)screens
+{
+    NSUInteger which = NSNotFound;
+    
+    for (NSUInteger i = 0; i < screens.count; ++i) {
+        NSScreen *screen = screens[i];
+        if (NSPointInRect(point, screen.frame)) {
+            which = i;
+            break;
+        }
+    }
+    
+    return which;
+}
+
+- (NSPoint)centerOfScreen:(NSScreen *)screen
+{
+    return NSMakePoint(screen.frame.origin.x + screen.frame.size.width / 2,
+                       screen.frame.origin.y + screen.frame.size.height / 2);
+}
+
+- (void)moveMouseToPoint:(CGPoint)point
+{
+    CGEventRef mouseEvent = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, point, kCGMouseButtonLeft);
+    if (mouseEvent) {
+        CGEventPost(kCGSessionEventTap, mouseEvent);
+        CFRelease(mouseEvent);
+    }
+}
+
+- (void)setLaunchAtLoginForURL:(NSURL *)itemURL
+{
+    LSSharedFileListItemRef appItem = [self findItemWithURL:itemURL];
+    if (!appItem) {
+        LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, (__bridge CFURLRef)(itemURL), NULL, NULL);
+        CFRelease(loginItems);
+    }
+}
+
+- (LSSharedFileListItemRef)findItemWithURL:(NSURL *)itemURL
+{
+    LSSharedFileListItemRef foundItem = NULL;
+    
+    if (!itemURL) {
+        return foundItem;
+    }
+    
+    LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+    NSArray *listSnapshot =  (__bridge NSArray *)(LSSharedFileListCopySnapshot(loginItems, NULL));
+    CFRelease(loginItems);
+    
+    UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
+    for (id item in listSnapshot) {
+        LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)item;
+        CFURLRef currentItemURL = LSSharedFileListItemCopyResolvedURL(itemRef, resolutionFlags, NULL);
+        
+        if (currentItemURL && [(__bridge NSURL *)(currentItemURL) isEqual:itemURL]) {
+            foundItem = itemRef;
+            
+            if (currentItemURL) { CFRelease(currentItemURL); }
+            break;
+        }
+        
+        if (currentItemURL) { CFRelease(currentItemURL); }
+    }
+    
+    return foundItem;
+}
+
+@end
