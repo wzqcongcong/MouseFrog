@@ -11,7 +11,6 @@
 		85713F181DE7D54D00616921 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 85713F171DE7D54D00616921 /* main.m */; };
 		85713F1A1DE7D54D00616921 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85713F191DE7D54D00616921 /* Assets.xcassets */; };
 		85713F1D1DE7D54D00616921 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 85713F1B1DE7D54D00616921 /* MainMenu.xib */; };
-		85C768541DE81D1D000D0E62 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 85C768531DE81D1D000D0E62 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,7 +21,6 @@
 		85713F191DE7D54D00616921 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		85713F1C1DE7D54D00616921 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		85713F1E1DE7D54D00616921 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		85C768531DE81D1D000D0E62 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +64,6 @@
 			isa = PBXGroup;
 			children = (
 				85713F1E1DE7D54D00616921 /* Info.plist */,
-				85C768531DE81D1D000D0E62 /* AppIcon.icns */,
 				85713F191DE7D54D00616921 /* Assets.xcassets */,
 				85713F1B1DE7D54D00616921 /* MainMenu.xib */,
 				85713F171DE7D54D00616921 /* main.m */,
@@ -133,7 +130,6 @@
 			files = (
 				85713F1A1DE7D54D00616921 /* Assets.xcassets in Resources */,
 				85713F1D1DE7D54D00616921 /* MainMenu.xib in Resources */,
-				85C768541DE81D1D000D0E62 /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
