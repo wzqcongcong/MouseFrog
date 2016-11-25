@@ -20,7 +20,8 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
     
-    [self setLaunchAtLoginForURL:[[NSBundle mainBundle] bundleURL]];
+    [self setLaunchAtLogin];
+
     self.isMonitoring = NO;
     self.lastLocation = [NSEvent mouseLocation];
     
@@ -119,44 +120,39 @@
     }
 }
 
-- (void)setLaunchAtLoginForURL:(NSURL *)itemURL
+- (void)setLaunchAtLogin
 {
-    LSSharedFileListItemRef appItem = [self findItemWithURL:itemURL];
-    if (!appItem) {
-        LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, (__bridge CFURLRef)(itemURL), NULL, NULL);
-        CFRelease(loginItems);
-    }
-}
+    NSURL *itemURL = [[NSBundle mainBundle] bundleURL];
 
-- (LSSharedFileListItemRef)findItemWithURL:(NSURL *)itemURL
-{
-    LSSharedFileListItemRef foundItem = NULL;
-    
-    if (!itemURL) {
-        return foundItem;
-    }
-    
     LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
-    NSArray *listSnapshot =  (__bridge NSArray *)(LSSharedFileListCopySnapshot(loginItems, NULL));
-    CFRelease(loginItems);
-    
-    UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
-    for (id item in listSnapshot) {
+
+    LSSharedFileListItemRef foundItem = NULL;
+
+    CFArrayRef listSnapshot = LSSharedFileListCopySnapshot(loginItems, NULL);
+    for (id item in (__bridge NSArray *)listSnapshot) {
         LSSharedFileListItemRef itemRef = (__bridge LSSharedFileListItemRef)item;
+        UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
         CFURLRef currentItemURL = LSSharedFileListItemCopyResolvedURL(itemRef, resolutionFlags, NULL);
-        
-        if (currentItemURL && [(__bridge NSURL *)(currentItemURL) isEqual:itemURL]) {
+
+        if (currentItemURL && [(__bridge NSURL *)currentItemURL isEqual:itemURL]) {
             foundItem = itemRef;
-            
-            if (currentItemURL) { CFRelease(currentItemURL); }
+        }
+
+        if (currentItemURL) {
+            CFRelease(currentItemURL);
+        }
+
+        if (foundItem) {
             break;
         }
-        
-        if (currentItemURL) { CFRelease(currentItemURL); }
     }
-    
-    return foundItem;
+    CFRelease(listSnapshot);
+
+    if (!foundItem) {
+        LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, (__bridge CFURLRef)itemURL, NULL, NULL);
+    }
+
+    CFRelease(loginItems);
 }
 
 @end
