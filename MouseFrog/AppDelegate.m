@@ -64,6 +64,9 @@
     NSPoint fromPoint = [NSEvent mouseLocation];
     CGFloat mouseDeltaX = fromPoint.x - self.lastLocation.x;
     CGFloat mouseDeltaY = fromPoint.y - self.lastLocation.y;
+    if ((mouseDeltaX == 0) && (mouseDeltaY == 0)) {
+        return toPoint;
+    }
 
     NSUInteger fromScreenIndex = [self locatePoint:fromPoint inScreens:screens];
     if (fromScreenIndex == NSNotFound) {
@@ -80,7 +83,11 @@
         CGFloat screenDeltaX = screenCenter.x - fromScreenCenter.x;
         CGFloat screenDeltaY = screenCenter.y - fromScreenCenter.y;
 
-        if ((mouseDeltaX * screenDeltaX >= 0) && (mouseDeltaY * screenDeltaY >= 0)) {
+        BOOL similar = [self isSimilarDirectionForMouseDeltaX:mouseDeltaX
+                                                  mouseDeltaY:mouseDeltaY
+                                                 screenDeltaX:screenDeltaX
+                                                 screenDeltaY:screenDeltaY];
+        if (similar) {
             CGRect cgRect = CGDisplayBounds(activeDisplays[i]);
             toPoint = CGPointMake(cgRect.origin.x + cgRect.size.width / 2, cgRect.origin.y + cgRect.size.height / 2);
             break;
@@ -109,6 +116,25 @@
 {
     return NSMakePoint(screen.frame.origin.x + screen.frame.size.width / 2,
                        screen.frame.origin.y + screen.frame.size.height / 2);
+}
+
+- (BOOL)isSimilarDirectionForMouseDeltaX:(CGFloat)mouseDeltaX
+                             mouseDeltaY:(CGFloat)mouseDeltaY
+                            screenDeltaX:(CGFloat)screenDeltaX
+                            screenDeltaY:(CGFloat)screenDeltaY
+{
+    if ((mouseDeltaX == 0) && (mouseDeltaY == 0)) {
+        return NO;
+
+    } else if (mouseDeltaX == 0) {
+        return (mouseDeltaY * screenDeltaY > 0);
+
+    } else if (mouseDeltaY == 0) {
+        return (mouseDeltaX * screenDeltaX > 0);
+
+    } else {
+        return ((mouseDeltaX * screenDeltaX > 0) && (mouseDeltaY * screenDeltaY > 0));
+    }
 }
 
 - (void)moveMouseToPoint:(CGPoint)point
