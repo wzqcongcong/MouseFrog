@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+#define kValidMouseMoveDelta    100
+
 @interface AppDelegate ()
 
 @property (nonatomic, assign) BOOL isMonitoring;
@@ -64,7 +66,7 @@
     NSPoint fromPoint = [NSEvent mouseLocation];
     CGFloat mouseDeltaX = fromPoint.x - self.lastLocation.x;
     CGFloat mouseDeltaY = fromPoint.y - self.lastLocation.y;
-    if ((mouseDeltaX == 0) && (mouseDeltaY == 0)) {
+    if (![self isValidMouseMoveMouseDeltaX:mouseDeltaX mouseDeltaY:mouseDeltaY]) {
         return toPoint;
     }
 
@@ -118,22 +120,33 @@
                        screen.frame.origin.y + screen.frame.size.height / 2);
 }
 
+- (BOOL)isValidMouseMoveMouseDeltaX:(CGFloat)mouseDeltaX
+                        mouseDeltaY:(CGFloat)mouseDeltaY
+{
+    if ((mouseDeltaX == 0) && (mouseDeltaY == 0)) {
+        return NO;
+    }
+    
+    if ((mouseDeltaX > kValidMouseMoveDelta) || (mouseDeltaY > kValidMouseMoveDelta)) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (BOOL)isSimilarDirectionForMouseDeltaX:(CGFloat)mouseDeltaX
                              mouseDeltaY:(CGFloat)mouseDeltaY
                             screenDeltaX:(CGFloat)screenDeltaX
                             screenDeltaY:(CGFloat)screenDeltaY
 {
-    if ((mouseDeltaX == 0) && (mouseDeltaY == 0)) {
+    if (![self isValidMouseMoveMouseDeltaX:mouseDeltaX mouseDeltaY:mouseDeltaY]) {
         return NO;
 
-    } else if (mouseDeltaX == 0) {
-        return (mouseDeltaY * screenDeltaY > 0);
-
-    } else if (mouseDeltaY == 0) {
-        return (mouseDeltaX * screenDeltaX > 0);
-
+    } else if ((mouseDeltaX * screenDeltaX == 0) && (mouseDeltaY * screenDeltaY == 0)) {
+        return NO;
+        
     } else {
-        return ((mouseDeltaX * screenDeltaX > 0) && (mouseDeltaY * screenDeltaY > 0));
+        return ((mouseDeltaX * screenDeltaX >= 0) && (mouseDeltaY * screenDeltaY >= 0));
     }
 }
 
