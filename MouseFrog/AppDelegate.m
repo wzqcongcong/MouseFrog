@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "MoveWindow.h"
 
 #define kValidMouseMoveDelta    100
 
@@ -14,6 +15,7 @@
 
 @property (nonatomic, assign) BOOL isMonitoring;
 @property (nonatomic, assign) NSPoint lastLocation;
+@property(nonatomic,assign)BOOL isMovingWindow;
 
 @end
 
@@ -26,9 +28,11 @@
 
     self.isMonitoring = NO;
     self.lastLocation = [NSEvent mouseLocation];
+    self.isMovingWindow = NO;
     
     [NSEvent addGlobalMonitorForEventsMatchingMask:NSFlagsChangedMask handler:^(NSEvent * _Nonnull event) {
         self.isMonitoring = (event.modifierFlags & NSFunctionKeyMask) ? YES : NO;
+        self.isMovingWindow = (event.modifierFlags & NSCommandKeyMask) ? YES : NO;
     }];
     
     [NSEvent addGlobalMonitorForEventsMatchingMask:NSMouseMovedMask handler:^(NSEvent * _Nonnull event) {
@@ -39,6 +43,13 @@
             }
         }
         self.lastLocation = [NSEvent mouseLocation];
+    }];
+    [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyDownMask handler:^(NSEvent * _Nonnull event) {
+        if (event.keyCode<=20) {
+            if (event.keyCode>=18) {
+                [self setCurrentWindow2Screen:event.keyCode-17];
+            }
+        }
     }];
 }
 
@@ -193,5 +204,12 @@
 
     CFRelease(loginItems);
 }
-
+- (void)setCurrentWindow2Screen:(int)screenNumber
+{
+    if (screenNumber<= [[NSScreen screens]count]&&self.isMovingWindow) {
+        MoveWindow* move = [[MoveWindow alloc]init];
+        [move sortScreenByunID];
+        [move goToScreen:screenNumber];
+    }
+}
 @end

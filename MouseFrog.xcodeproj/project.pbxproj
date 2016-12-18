@@ -11,6 +11,7 @@
 		85713F181DE7D54D00616921 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 85713F171DE7D54D00616921 /* main.m */; };
 		85713F1A1DE7D54D00616921 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 85713F191DE7D54D00616921 /* Assets.xcassets */; };
 		85713F1D1DE7D54D00616921 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 85713F1B1DE7D54D00616921 /* MainMenu.xib */; };
+		C1288A9F1E0674CB005600C2 /* MoveWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C1288A9E1E0674CB005600C2 /* MoveWindow.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,8 @@
 		85713F191DE7D54D00616921 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		85713F1C1DE7D54D00616921 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		85713F1E1DE7D54D00616921 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C1288A9D1E0674CB005600C2 /* MoveWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoveWindow.h; sourceTree = "<group>"; };
+		C1288A9E1E0674CB005600C2 /* MoveWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoveWindow.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +58,8 @@
 			children = (
 				85713F131DE7D54D00616921 /* AppDelegate.h */,
 				85713F141DE7D54D00616921 /* AppDelegate.m */,
+				C1288A9D1E0674CB005600C2 /* MoveWindow.h */,
+				C1288A9E1E0674CB005600C2 /* MoveWindow.m */,
 				85713F161DE7D54D00616921 /* Supporting Files */,
 			);
 			path = MouseFrog;
@@ -142,6 +147,7 @@
 			files = (
 				85713F181DE7D54D00616921 /* main.m in Sources */,
 				85713F151DE7D54D00616921 /* AppDelegate.m in Sources */,
+				C1288A9F1E0674CB005600C2 /* MoveWindow.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
