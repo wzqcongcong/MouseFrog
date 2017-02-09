@@ -1,6 +1,6 @@
 # MouseFrog
 
-Let mouse move more quickly and conveniently on multi screens:
+Let mouse move more quickly and conveniently on multi screens.
 
 Usage:
 
